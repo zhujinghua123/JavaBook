@@ -35,6 +35,6 @@ public class Student implements Serializable {
 
     @Override
     public String toString() {
-        return "\n" + " name='" + name + '\'' + ", score=" + score;
+        return "name='" + name + '\'' + ", score=" + score;
     }
 }

@@ -14,9 +14,8 @@ import static chap17.stu.UserControl.FILE_NAME;
 public class ObjectInOutputStream {
     public static ArrayList<Student> readFile() {
         ArrayList<Student> students = new ArrayList<>();
-        ObjectInputStream ois = null;
-        try {
-            FileInputStream fileInputStream = new FileInputStream(FILE_NAME);
+        ObjectInputStream ois;
+        try (FileInputStream fileInputStream = new FileInputStream(FILE_NAME)) {
             ois = new ObjectInputStream(fileInputStream);
             while (fileInputStream.available() > 0) {
                 Student stuTemp;
@@ -24,13 +23,7 @@ public class ObjectInOutputStream {
                 students.add(stuTemp);
             }
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            ois.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("无数据！");
         }
         return students;
     }
@@ -38,7 +31,7 @@ public class ObjectInOutputStream {
     public static int writeFile(ArrayList<Student> studentArrayList) {
         int tag;
         ObjectOutputStream oos = null;
-        FileOutputStream fos = null;
+        FileOutputStream fos;
         try {
             //append参数为true时从文件末尾写，否则覆写
             fos = new FileOutputStream(FILE_NAME, true);
@@ -47,19 +40,16 @@ public class ObjectInOutputStream {
             } else {
                 oos = new MyObjectOutputStream(fos);
             }
-
             for (Student student : studentArrayList) {
                 oos.writeObject(student);
             }
             tag = 1;
-        }  catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
             tag = -1;
         } finally {
             try {
-                if (oos != null) {
-                    oos.close();
-                }
+                assert oos != null;
+                oos.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

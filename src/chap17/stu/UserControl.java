@@ -1,6 +1,8 @@
 package chap17.stu;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -13,15 +15,15 @@ public class UserControl {
     //文件名
     static File FILE_NAME = new File("D:\\桌面\\student.txt");
     //临时变量数组
-    public ArrayList<Student> students = new ArrayList<>();
+    public ArrayList<Student> students;
 
     public ArrayList<Student> inputStudent() {
+        students = new ArrayList<>();
         System.out.print("输入要储存学生的个数：");
         Scanner scanner = new Scanner(System.in);
         int num = scanner.nextInt();
         for (int i = 0; i < num; ++i) {
             System.out.print("输入第" + (i + 1) + "个学生：");
-            //创建临时变量
             Student studentTemp = new Student();
             studentTemp.setName(scanner.next());
             studentTemp.setScore(scanner.nextFloat());
@@ -53,6 +55,7 @@ public class UserControl {
     }
 
     public void readF() {
+        students = new ArrayList<>();
         students = ObjectInOutputStream.readFile();
         students.sort((o1, o2) -> {
             if (o1.getScore() > o2.getScore()) {
@@ -62,10 +65,27 @@ public class UserControl {
             }
             return 0;
         });
+        System.out.println(students);
     }
 
-    public void printFile() {
-        System.out.print(students);
+    public void clearFile() {
+        try (FileWriter fileWriter = new FileWriter(FILE_NAME)) {
+            fileWriter.write("");
+            fileWriter.flush();
+            System.out.println("清除成功");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public void menu() {
+        System.out.println("1.录入学生数据");
+        System.out.println("2.查看学生数据");
+        System.out.println("3.输出得分信息");
+        System.out.println("4.清除学生数据");
+        System.out.println("0.退出");
     }
 
 }
