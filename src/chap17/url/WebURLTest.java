@@ -22,11 +22,11 @@ public class WebURLTest {
     //得到的数据
     List<NewsData> dataList = new ArrayList<>();
     
-    public void crawler(String startURL) {
+    public void crawler(String startURL, int num) {
         // 将起始Url放入待爬取列表
         waitURL.add(startURL);
         // 循环爬取
-        while (!waitURL.isEmpty() && edURL.size() <= 10) {
+        while (!waitURL.isEmpty() && edURL.size() < num) {
             //从待爬取列表中取出一个Url
             String urlString = waitURL.remove(0);
             // 判断该Url是否已爬取过
@@ -111,7 +111,7 @@ public class WebURLTest {
                         "\">") && !temp.contains("<span style=\"font-family:楷体, 楷体_gb2312, simkai;\">")) {
                     strRes.append(temp);
                 }
-            
+    
             }
         }
         deleteStr(strRes, "<span>");
@@ -134,6 +134,7 @@ public class WebURLTest {
     }
     
     public void printRes() {
+        System.out.println();
         for (NewsData newsData : dataList) {
             System.out.println("日期：" + newsData.time + "  标题：" + newsData.title + "  文章：" + newsData.data);
         }

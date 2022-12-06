@@ -1,5 +1,7 @@
 package chap17.url;
 
+import java.util.Scanner;
+
 /**
  * @Description 测试
  * @Author 住京华
@@ -9,7 +11,9 @@ public class Test {
     public static void main(String[] args) {
         
         WebURLTest webURLTest = new WebURLTest();
-        webURLTest.crawler("http://news.jxufe.edu.cn/news-show-120596.html");
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("输入起始url以及篇数：");
+        webURLTest.crawler(scanner.next(), scanner.nextInt());
         webURLTest.printRes();
         
     }
