@@ -42,47 +42,45 @@ public class WebURLTest {
     }
     
     public String crawlData(String urlString) {
-        var stringBuffer = new StringBuffer();
+        var stringBuilder = new StringBuilder();
         try {
             URL url = new URL(urlString);
-            int count = 0;
             try (var input = new Scanner(url.openStream())) {
                 while (input.hasNext()) {
                     String line = input.nextLine();
-                    count += line.length();
-                    stringBuffer.append(line).append("\n");
+                    stringBuilder.append(line).append("\n");
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return stringBuffer.toString();
+        return stringBuilder.toString();
     }
     
     public NewsData extraData(String context) {
         NewsData newsData = new NewsData();
-        String titleStart = "<h3 id=\"shareTitle\" class=\"fs24\">";
-        String titleEnd = "</h3>";
-        String timeStart = "<span>日期：";
-        String timeEnd = " </span>|\n" +
-                "                        <span>来源：";
-        
-        int titleStartIndex = context.indexOf(titleStart) + titleStart.length();
-        int titleEndIndex = context.indexOf(titleEnd, titleStartIndex);
-        int timeStartIndex = context.indexOf(timeStart) + timeStart.length();
-        int timeEndIndex = context.indexOf(timeEnd);
-        newsData.title = context.substring(titleStartIndex, titleEndIndex);
-        newsData.time = context.substring(timeStartIndex, timeEndIndex);
+        Pattern patternTitle = Pattern.compile("(<title>)(.*?)(</title>)");
+        Pattern patternTime = Pattern.compile("(<span>日期：)(.*?)(</span>)");
+        Matcher matcherTitle = patternTitle.matcher(context);
+        Matcher matcherTime = patternTime.matcher(context);
+        while (matcherTitle.find()) {
+            newsData.title = matcherTitle.group(2);
+        }
+        while (matcherTime.find()) {
+            newsData.time = matcherTime.group(2);
+        }
         return newsData;
     }
     
     public String extraUrl(String context) {
-        String urlStart = "syp\" style=\"margin-top: 20px;\">\n" +
-                "                            <a href=\"";
-        String urlEnd = "\" class=\"syp1\"";
-        int urlStartIndex = context.indexOf(urlStart) + urlStart.length();
-        int urlEndIndex = context.indexOf(urlEnd);
-        return context.substring(urlStartIndex, urlEndIndex);
+        String res = "";
+        Pattern patternUrl = Pattern.compile("(<div class=\"related_articles syp\" style=\"margin-top: 20px;\">\n" +
+                " {28}<a href=\")(.*?)(\" class=\"syp1\" style=\"display:block;\">)");
+        Matcher matcherUrl = patternUrl.matcher(context);
+        while (matcherUrl.find()) {
+            res = matcherUrl.group(2);
+        }
+        return res;
     }
     
     public String extraArticle(String context) {
@@ -92,28 +90,28 @@ public class WebURLTest {
         int startIndex = context.indexOf(startTag) + startTag.length();
         int endIndex = context.indexOf(endTag, startIndex);
         String needStr = context.substring(startIndex, endIndex);
-        Pattern pattern1 = Pattern.compile("(<p>)(.*?)(</p>)");
-        Pattern pattern2 = Pattern.compile("(<span)(.*?)(>)(.*?)(</span>)");
-        Matcher matcher1 = pattern1.matcher(needStr);
-        Matcher matcher2 = pattern2.matcher(needStr);
-        String temp = "";
+        Pattern patternP = Pattern.compile("(<p>)(.*?)(</p>)");
+        Pattern patternSpan = Pattern.compile("(<span)(.*?)(>)(.*?)(</span>)");
+        Matcher matcherP = patternP.matcher(needStr);
+        Matcher matcherSpan = patternSpan.matcher(needStr);
+        String temp;
         var strRes = new StringBuffer();
         if (needStr.contains("<span>")) {
-            while (matcher2.find()) {
-                temp = matcher2.group(4);
+            while (matcherSpan.find()) {
+                temp = matcherSpan.group(4);
                 if (!temp.contains("<span style=\"font-family:arial, helvetica, sans-serif;\">") && !temp.contains(
                         "<span style=\"font-family:楷体, 楷体_gb2312, simkai;\">") && !temp.contains("<br>")) {
-                    strRes.append(matcher2.group(4));
+                    strRes.append(matcherSpan.group(4));
                 }
             }
         } else {
-            while (matcher1.find()) {
-                temp = matcher1.group(2);
+            while (matcherP.find()) {
+                temp = matcherP.group(2);
                 if (!temp.contains("<br>") && !temp.contains("<span style=\"font-family:arial, helvetica, sans-serif;" +
                         "\">") && !temp.contains("<span style=\"font-family:楷体, 楷体_gb2312, simkai;\">")) {
                     strRes.append(temp);
                 }
-                
+            
             }
         }
         deleteStr(strRes, "<span>");

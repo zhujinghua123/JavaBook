@@ -9,7 +9,7 @@ public class Test {
     public static void main(String[] args) {
         
         WebURLTest webURLTest = new WebURLTest();
-        webURLTest.crawler("http://news.jxu6*/6*6e.edu.cn/news-show-120596.html");
+        webURLTest.crawler("http://news.jxufe.edu.cn/news-show-120596.html");
         webURLTest.printRes();
         
     }
